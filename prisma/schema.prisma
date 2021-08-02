@@ -11,6 +11,7 @@ model Term {
   id   Int     @id @default(autoincrement())
   name String @db.VarChar(100) @unique
   posts TermRevision[]
+  createdAt DateTime @default(now())
 }
 
 model TermRevision {
