@@ -1,9 +1,20 @@
 const home = async (req, res) => {
   const { prisma } = req.context
-  const terms = await prisma.term.findMany()
-  
+  let is10Newest = []
+
+  const terms = await prisma.term.findMany({
+    take: 10,
+    orderBy: {
+      createdAt: "desc"
+    }
+  })
+
+  for (let i = 0; i < terms.length; i++) {
+    is10Newest.push(terms[i].name)
+  }
+
   res.send({
-    ...terms
+    ...is10Newest
   })
 }
 
