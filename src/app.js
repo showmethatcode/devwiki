@@ -1,8 +1,8 @@
-const express = require('express');
-const cors = require('cors')
+const express = require("express");
+const cors = require("cors");
 const morgan = require("morgan");
 const logger = morgan("dev");
-const { router } = require('./rest/routes');
+const router = require("./rest/routes");
 
 function createApplication(prisma) {
   const app = express();
@@ -11,11 +11,11 @@ function createApplication(prisma) {
   app.use(cors());
   app.use(logger);
   app.use((req, res, next) => {
-    req.context = {req, res, prisma};
+    req.context = { req, res, prisma };
     next();
   });
   app.use(router);
-  return app
+  return app;
 }
 
-module.exports = createApplication
+module.exports = createApplication;
