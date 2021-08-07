@@ -25,6 +25,14 @@ const writeTerm = async (req, res) => {
   const { prisma } = req.context;
   const { name, description } = req.body;
 
+  const checkSameTerm = await prisma.term.findUnique({
+    where: {
+      name,
+    },
+  });
+
+  console.log(checkSameTerm);
+
   const createTerm = await prisma.term.create({
     // 용어 생성과 동시에 내용 생성, termRevision 정보도 가져온다.
     data: {
