@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const {
   home,
-  writeTerm,
+  createTerm,
   detailTerm,
   getUpdateTerm,
   postUpdateTerm,
@@ -10,7 +10,7 @@ const {
 const router = Router();
 
 router.get("/terms/recent", home);
-router.post("/terms/write", writeTerm);
+router.post("/terms/write", createTerm);
 router.route("/terms/:id/edit").get(getUpdateTerm).post(postUpdateTerm);
 router.get("/terms/:id", detailTerm);
 
