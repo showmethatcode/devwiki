@@ -38,8 +38,6 @@ const writeTerm = async (req, res) => {
     include: { termRevision: true },
   });
 
-  console.log(createTerm);
-
   const createTermPointer = await prisma.termPointer.create({
     // 위에서 가져온 termRevision으로 termPointer에 있는 termRevisionId value 저장
     data: {
@@ -58,7 +56,7 @@ const getUpdateTerm = async (req, res) => {
   const { prisma } = req.context;
   const id = Number(req.params.id);
 
-  const findTerm = await prisma.term.findUnique({
+  const term = await prisma.term.findUnique({
     // 업데이트 할 용어 가져오고, termPointer 정보도 가져온다.
     where: {
       id,
@@ -66,16 +64,16 @@ const getUpdateTerm = async (req, res) => {
     include: { termPointer: true },
   });
 
-  const findTermRevision = await prisma.termRevision.findMany({
-    // findTerm에서 가져온 termPointer 정보에 담겨있는 termRevisionId 값을 이용해 체크포인트로 저장된 description을 보내줌
+  const revisions = await prisma.termRevision.findMany({
+    // term에서 가져온 termPointer 정보에 담겨있는 termRevisionId 값을 이용해 체크포인트로 저장된 description을 보내줌
     where: {
-      id: findTerm.termPointer.termRevisionId,
+      id: term.termPointer.termRevisionId,
       termId: id,
     },
   });
 
-  const termName = findTerm.name;
-  const termDescription = findTermRevision[0].description;
+  const termName = term.name;
+  const termDescription = revisions[0].description;
 
   res.send({
     termName,
@@ -116,24 +114,23 @@ const detailTerm = async (req, res) => {
   const { prisma } = req.context;
   const id = Number(req.params.id);
 
-  const findTerm = await prisma.term.findUnique({
-    // 업데이트 할 용어 가져오고, termPointer 정보도 가져온다.
+  const term = await prisma.term.findUnique({
     where: {
       id,
     },
     include: { termPointer: true },
   });
 
-  const findTermRevision = await prisma.termRevision.findMany({
+  const revisions = await prisma.termRevision.findMany({
     // findTerm에서 가져온 termPointer 정보에 담겨있는 termRevisionId 값을 이용해 체크포인트로 저장된 description을 보내줌
     where: {
-      id: findTerm.termPointer.termRevisionId,
+      id: term.termPointer.termRevisionId,
       termId: id,
     },
   });
 
-  const termName = findTerm.name;
-  const termDescription = findTermRevision[0].description;
+  const termName = term.name;
+  const termDescription = revisions[0].description;
 
   res.send({
     termName,
