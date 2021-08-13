@@ -1,7 +1,7 @@
 const createTerm = async (req, res) => {
   try {
     const { prisma } = req.context;
-    const { name, description } = req.body;
+    const { name, description, relatedTerm } = req.body;
 
     if (!name) {
       const error = new Error("용어 이름을 적어주세요.");
@@ -40,8 +40,17 @@ const createTerm = async (req, res) => {
       },
     });
 
+    const termRelated = await prisma.termRelated.create({
+      data: {
+        relatedTerm,
+      },
+    });
+
+    console.log(termRelated);
+
     res.status(201).json({
       ...term,
+      ...termRelated,
     });
   } catch (err) {
     res.status(err.statusCode).json({ message: err.message });
