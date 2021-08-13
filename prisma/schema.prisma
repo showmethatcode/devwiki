@@ -34,7 +34,7 @@ model TermPointer {
 }
 
 
-// model TermRelated {
-//   id             Int           @id @default(autoincrement())
-//   term
-// }
+model TermRelated {
+  id             Int           @id @default(autoincrement())
+  relatedTerm    String[]
+}
