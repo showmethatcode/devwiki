@@ -5,11 +5,11 @@ const PORT = process.env.PORT;
 
 const prisma = new PrismaClient();
 
-function handleListening() {
+function main() {
   const app = createApplication(prisma);
   app.listen(PORT, () => {
     console.log("✅ Sever Listening on port http://localhost:3000/");
   });
 }
 
-handleListening();
+main();
