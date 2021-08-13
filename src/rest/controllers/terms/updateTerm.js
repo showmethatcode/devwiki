@@ -6,10 +6,7 @@ const getUpdateTerm = async (req, res) => {
     where: {
       id,
     },
-    include: {
-      termPointer: true,
-      termRevision: true,
-    },
+    include: { termPointer: true },
   });
 
   const termRevision = await prisma.termRevision.findMany({
@@ -26,30 +23,32 @@ const getUpdateTerm = async (req, res) => {
 };
 
 const postUpdateTerm = async (req, res) => {
-  const { prisma } = req.context;
-  const id = Number(req.params.id);
-  const { description } = req.body;
+  try {
+    const { prisma } = req.context;
+    const { name, description } = req.body;
+    const id = Number(req.params.id);
 
-  const termRevision = await prisma.termRevision.create({
-    data: {
-      description,
-      termId: id,
-    },
-  });
+    const termRevision = await prisma.termRevision.create({
+      data: {
+        description,
+        termId: id,
+      },
+    });
 
-  const termPointer = await prisma.termPointer.update({
-    where: {
-      termId: id,
-    },
-    data: {
-      termRevisionId: termRevision.id,
-    },
-  });
+    const termPointer = await prisma.termPointer.update({
+      where: {
+        termId: id,
+      },
+      data: {
+        termRevisionId: termRevision.id,
+      },
+    });
 
-  res.send({
-    ...termRevision,
-    ...termPointer,
-  });
+    res.send({
+      ...termRevision,
+      ...termPointer,
+    });
+  } catch (err) {}
 };
 
 module.exports = { getUpdateTerm, postUpdateTerm };
