@@ -25,7 +25,7 @@ const getUpdateTerm = async (req, res) => {
 const postUpdateTerm = async (req, res) => {
   try {
     const { prisma } = req.context;
-    const { name, description } = req.body;
+    const { description } = req.body;
     const id = Number(req.params.id);
 
     const termRevision = await prisma.termRevision.create({
