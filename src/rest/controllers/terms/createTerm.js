@@ -2,21 +2,15 @@ const createTerm = async (req, res) => {
   try {
     const { prisma } = req.context;
     const { name, description, relatedTerm } = req.body;
-
-    if (!name) {
-      const error = new Error("용어 이름을 적어주세요.");
-      error.statusCode = 400;
-      throw error;
-    }
-
+    
     const foundTerm = await prisma.term.findUnique({
       where: {
         name,
       },
     });
 
-    if (foundTerm) {
-      const error = new Error("이미 있는 용어입니다.");
+    if (!name || foundTerm) {
+      const error = new Error("용어 이름이 작성되지 않았거나 이미 있는 용어입니다.");
       error.statusCode = 400;
       throw error;
     }
@@ -33,7 +27,7 @@ const createTerm = async (req, res) => {
       include: { termRevision: true },
     });
 
-    await prisma.termPointer.create({
+    const termPointer = await prisma.termPointer.create({
       data: {
         termId: term.id,
         termRevisionId: term.termRevision[0].id,
@@ -46,10 +40,9 @@ const createTerm = async (req, res) => {
       },
     });
 
-    console.log(termRelated);
-
     res.status(201).json({
       ...term,
+      ...termPointer,
       ...termRelated,
     });
   } catch (err) {
