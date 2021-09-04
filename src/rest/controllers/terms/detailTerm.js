@@ -9,12 +9,11 @@ const detailTerm = async (req, res) => {
     include: { termPointer: true },
   });
 
-  const termRevision = await prisma.termRevision.findMany({
+  const termRevision = await prisma.term.findUnique({
     where: {
       id: term.termPointer.termRevisionId,
-      termId: id,
-    },
-  });
+    }
+  })
 
   res.send({
     term,
