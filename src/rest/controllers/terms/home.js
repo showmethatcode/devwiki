@@ -8,10 +8,8 @@ const getRecentTermList = async (req, res) => {
     },
   });
 
-  const termNames = terms.map((term) => term.name);
-
   res.send({
-    recentTermList: [...termNames],
+      ...terms
   });
 };
 
