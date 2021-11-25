@@ -9,9 +9,11 @@ const {
 
 const router = Router();
 
-router.get("/terms/recent", home);
-router.post("/terms/write", createTerm);
-router.route("/terms/:id/edit").get(getUpdateTerm).post(postUpdateTerm);
-router.get("/terms/:id", detailTerm);
+router.get("/terms", termListHandler);
+router.get("/terms/latest", latestTermListHandler);
+router.post("/terms", termCreateHandler);
+router.get("/terms/:id", termDeleteHandler);
+router.put("/terms/:id/edit", termUpdateHandler);
+router.delete("/terms/:id", termDetailHanlder);
 
 module.exports = router;
