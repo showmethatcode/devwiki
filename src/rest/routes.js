@@ -1,13 +1,20 @@
 import { Router } from 'express'
-import { latestTermListHandler } from './controllers/terms/index.js'
+import {
+  termListController,
+  latestTermListController,
+  termCreateController,
+  termDetailController,
+  termUpdateController,
+  revisionListController,
+} from './controllers/terms/index.js'
 
 const router = Router()
 
-// router.get("/terms", termListHandler);
-router.get('/terms/latest', latestTermListHandler)
-// router.post("/terms", termCreateHandler);
-// router.get("/terms/:id", termDeleteHandler);
-// router.put("/terms/:id/edit", termUpdateHandler);
-// router.delete("/terms/:id", termDetailHanlder);
+router.get('/terms', termListController)
+router.get('/terms/latest', latestTermListController)
+router.post('/terms', termCreateController)
+router.get('/terms/:id', termDetailController)
+router.put('/terms/:id', termUpdateController)
+router.get('/terms/:id/revisions', revisionListController)
 
 export default router
