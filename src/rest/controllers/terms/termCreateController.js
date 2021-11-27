@@ -8,52 +8,49 @@ export async function termCreateController(req, res) {
     res.sendStatus(400)
   }
 
-  const {
-    id: termId,
-    name: termName,
-    revisions,
-    createdAt,
-    updatedAt,
-  } = await prisma.term.upsert({
-    where: {
-      name,
-    },
-    create: {
-      name,
-      revisions: {
-        create: {
-          description,
+  const transactionResult = await prisma.$transaction(async (prisma) => {
+    const {
+      id: termId,
+      name: termName,
+      revisions,
+      createdAt,
+      updatedAt,
+    } = await prisma.term.upsert({
+      where: {
+        name,
+      },
+      create: {
+        name,
+        revisions: {
+          create: {
+            description,
+          },
         },
       },
-    },
-    update: {
-      revisions: {
-        create: {
-          description,
+      update: {
+        revisions: {
+          create: {
+            description,
+          },
         },
       },
-    },
-    include: {
-      revisions: {
-        take: 1,
+      include: {
+        revisions: {
+          take: 1,
+        },
       },
-    },
-  })
-  const [revision] = revisions
+    })
+    const [revision] = revisions
+    await prisma.termPointer.upsert({
+      where: { termId },
+      create: { termId, revisionId: revision.id },
+      update: { termId, revisionId: revision.id },
+    })
 
-  await prisma.termPointer.upsert({
-    where: { termId },
-    create: { termId, revisionId: revision.id },
-    update: { termId, revisionId: revision.id },
+    return { id: termId, termName, description, createdAt, updatedAt }
   })
 
   res.status(201).json({
-    term: {
-      id: termId,
-      termName,
-      description,
-      createdAt,
-      updatedAt,
-    },
+    term: transactionResult,
   })
 }
