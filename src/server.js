@@ -1,15 +1,18 @@
-require("dotenv").config();
-const { PrismaClient } = require("@prisma/client");
-const createApplication = require("./app");
-const PORT = process.env.PORT;
+import * as dotenv from 'dotenv'
+import prisma from '@prisma/client'
+import createApplication from './app.js'
 
-const prisma = new PrismaClient();
+dotenv.config()
+const { PrismaClient } = prisma
+const PORT = process.env.PORT
+
+const prismaClient = new PrismaClient()
 
 function handleListening() {
-  const app = createApplication(prisma);
+  const app = createApplication(prismaClient)
   app.listen(PORT, () => {
-    console.log("✅ Sever Listening on port http://localhost:3000/");
-  });
+    console.log('✅ Sever Listening on port http://localhost:3000/')
+  })
 }
 
-handleListening();
+handleListening()
