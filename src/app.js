@@ -1,21 +1,16 @@
-const express = require("express");
-const cors = require("cors");
-const morgan = require("morgan");
-const logger = morgan("dev");
-const router = require("./rest/routes");
+import express from 'express'
+import cors from 'cors'
+import router from './rest/routes.js'
 
-function createApplication(prisma) {
-  const app = express();
-  app.use(express.urlencoded({ extended: true }));
-  app.use(express.json());
-  app.use(cors());
-  app.use(logger);
+export default function createApplication(prisma) {
+  const app = express()
+  app.use(express.urlencoded({ extended: true }))
+  app.use(express.json())
+  app.use(cors())
   app.use((req, res, next) => {
-    req.context = { req, res, prisma };
-    next();
-  });
-  app.use(router);
-  return app;
+    req.context = { req, res, prisma }
+    next()
+  })
+  app.use(router)
+  return app
 }
-
-module.exports = createApplication;

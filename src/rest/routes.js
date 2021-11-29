@@ -1,17 +1,20 @@
-const { Router } = require("express");
-const {
-  home,
-  createTerm,
-  detailTerm,
-  getUpdateTerm,
-  postUpdateTerm,
-} = require("./controllers/termController");
+import { Router } from 'express'
+import {
+  termListController,
+  latestTermListController,
+  termCreateController,
+  termDetailController,
+  termUpdateController,
+  revisionListController,
+} from './controllers/terms/index.js'
 
-const router = Router();
+const router = Router()
 
-router.get("/terms/recent", home);
-router.post("/terms/write", createTerm);
-router.route("/terms/:id/edit").get(getUpdateTerm).post(postUpdateTerm);
-router.get("/terms/:id", detailTerm);
+router.get('/terms', termListController)
+router.get('/terms/latest', latestTermListController)
+router.post('/terms', termCreateController)
+router.get('/terms/:id', termDetailController)
+router.put('/terms/:id', termUpdateController)
+router.get('/terms/:id/revisions', revisionListController)
 
-module.exports = router;
+export default router

@@ -1,0 +1,6 @@
+export { latestTermListController } from './latestTermListController.js'
+export { termCreateController } from './termCreateController.js'
+export { termListController } from './termListController.js'
+export { termDetailController } from './termDetailController.js'
+export { termUpdateController } from './termUpdateController.js'
+export { revisionListController } from './revisionListController.js'
