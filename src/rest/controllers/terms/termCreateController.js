@@ -37,6 +37,9 @@ export async function termCreateController(req, res) {
       include: {
         revisions: {
           take: 1,
+          orderBy: {
+            id: 'desc',
+          },
         },
       },
     })
