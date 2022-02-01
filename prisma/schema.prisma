@@ -18,8 +18,6 @@ model Term {
   revisions  TermRevision[]
   termParent Term[]         @relation("TermRelated", references: [id])
   termChild  Term[]         @relation("TermRelated", references: [id])
-  // termParent TermRelated[]  @relation("TermParent")
-  // termChild  TermRelated[]  @relation("TermChild")
 }
 
 model TermRevision {
@@ -41,12 +39,3 @@ model TermPointer {
   term     Term         @relation(fields: [termId], references: [id])
   revision TermRevision @relation(fields: [revisionId], references: [id])
 }
-
-// model TermRelated {
-//   id     Int @id @default(autoincrement())
-//   parent Int
-//   child  Int
-
-//   term        Term @relation("TermParent", fields: [parent], references: [id])
-//   termRelated Term @relation("TermChild", fields: [child], references: [id])
-// }
