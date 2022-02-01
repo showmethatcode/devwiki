@@ -6,20 +6,24 @@ export async function termDetailController(req, res) {
   })
 
   const [term, revision] = await Promise.all([
-    prisma.term.findUnique({ where: { id: pointer.termId } }),
+    prisma.term.findUnique({
+      where: { id: pointer.termId },
+      include: { termChild: true },
+    }),
     prisma.termRevision.findUnique({
       where: { id: pointer.revisionId },
       select: { description: true },
     }),
   ])
 
-  res.json({
+  return res.json({
     term: {
       id: term.id,
       name: term.name,
       description: revision.description,
       createdAt: term.createdAt,
       updatedAt: term.updatedAt,
+      termsRelated: term.termChild,
     },
   })
 }

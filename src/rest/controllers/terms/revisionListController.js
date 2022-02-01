@@ -24,7 +24,7 @@ export async function revisionListController(req, res) {
     },
   })
 
-  res.json({
+  return res.json({
     ...(revisions.length && {
       cursor: encodeCursor({ id: revisions[revisions.length - 1].id }),
     }),

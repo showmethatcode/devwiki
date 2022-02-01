@@ -4,5 +4,5 @@ export async function latestTermListController(req, res) {
     orderBy: { updatedAt: 'desc' },
     take: 20,
   })
-  res.json({ terms: latestTerms })
+  return res.json({ terms: latestTerms })
 }

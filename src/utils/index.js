@@ -5,3 +5,9 @@ export function encodeCursor(cursor) {
 export function decodeCursor(cursor) {
   return JSON.parse(Buffer.from(cursor, 'base64').toString('ascii'))
 }
+
+export function shollowCleanObject(obj) {
+  return Object.entries(obj)
+    .filter(([, value]) => (value !== undefined) | null)
+    .reduce((prev, [k, v]) => ({ ...prev, [k]: v }), {})
+}

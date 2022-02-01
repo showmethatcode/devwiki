@@ -10,7 +10,7 @@ export async function termListController(req, res) {
     ...(cursor && { skip: 1, cursor: decodeCursor(cursor) }),
   })
 
-  res.json({
+  return res.json({
     ...(terms[terms.length - 1] && {
       cursor: encodeCursor({ id: terms[terms.length - 1].id }),
     }),
