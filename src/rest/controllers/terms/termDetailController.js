@@ -5,6 +5,12 @@ export async function termDetailController(req, res) {
     where: { termId: parseInt(id, 10) },
   })
 
+  if (!pointer) {
+    return res.status(400).send({
+      message: 'invalid term id',
+    })
+  }
+
   const [term, revision] = await Promise.all([
     prisma.term.findUnique({
       where: { id: pointer.termId },
