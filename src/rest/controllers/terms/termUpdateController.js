@@ -18,7 +18,7 @@ export async function termUpdateController(req, res) {
     return res.sendStatus(404)
   }
   const childNames = fetched?.termChild?.map((child) => child.name) ?? []
-  const deleteTargetNames = childNames.filter(
+  const disconnectTargets = childNames.filter(
     (name) => !termRelatedNames.includes(name),
   )
   const transactionResult = await prisma.$transaction(async (prisma) => {
@@ -31,7 +31,7 @@ export async function termUpdateController(req, res) {
               where: { name },
               create: { name },
             })),
-            disconnect: deleteTargetNames.map((name) => ({ name })),
+            disconnect: disconnectTargets.map((name) => ({ name })),
           },
         }),
       },
