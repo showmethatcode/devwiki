@@ -17,15 +17,8 @@ export async function termCreateController(req, res) {
     })
   }
 
-  const transactionResult = await prisma.$transaction(async (prisma) => {
-    const {
-      id: termId,
-      name: termName,
-      revisions,
-      createdAt,
-      updatedAt,
-      termChild: termsRelated,
-    } = await prisma.term.create({
+  const result = await prisma.$transaction(async (prisma) => {
+    const termCreated = await prisma.term.create({
       data: {
         name,
         revisions: {
@@ -37,7 +30,13 @@ export async function termCreateController(req, res) {
           termChild: {
             connectOrCreate: termRelatedNames.map((name) => ({
               where: { name },
-              create: { name },
+              create: {
+                name,
+                /**
+                 * Create Revision for TermRelated
+                 */
+                revisions: { create: {} },
+              },
             })),
           },
         }),
@@ -49,26 +48,53 @@ export async function termCreateController(req, res) {
             id: 'desc',
           },
         },
-        termChild: true,
+        termChild: {
+          include: {
+            revisions: {
+              take: 1,
+              orderBy: { id: 'desc' },
+              include: { termPointer: true },
+            },
+          },
+        },
       },
     })
 
-    const [revision] = revisions
-    await prisma.termPointer.create({
-      data: { termId, revisionId: revision.id },
-    })
+    const newRelatedTerms = termCreated.termChild.filter(
+      (term) => !term.revisions[0].termPointer,
+    )
+    await Promise.all([
+      prisma.termPointer.create({
+        data: {
+          termId: termCreated.id,
+          revisionId: termCreated.revisions[0].id,
+        },
+      }),
+      /**
+       * Create pointer for TermRelated just created
+       */
+      ...newRelatedTerms.map((term) =>
+        prisma.termPointer.create({
+          data: { termId: term.id, revisionId: term.revisions[0].id },
+        }),
+      ),
+    ])
 
-    return {
-      id: termId,
-      termName,
-      description,
-      createdAt,
-      updatedAt,
-      termsRelated,
-    }
+    return termCreated
   })
 
-  return res.status(201).json({
-    term: transactionResult,
-  })
+  const payload = {
+    term: {
+      id: result.id,
+      name: result.name,
+      description: result.revisions[0].description,
+      createdAt: result.createdAt,
+      updatedAt: result.updatedAt,
+      termsRelated: result.termChild.map((termRelated) => ({
+        id: termRelated.id,
+        name: termRelated.name,
+      })),
+    },
+  }
+  return res.status(201).json(payload)
 }
