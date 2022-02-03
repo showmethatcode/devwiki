@@ -9,28 +9,33 @@ generator client {
 }
 
 model Term {
-  id        Int            @id @default(autoincrement())
-  name      String         @unique
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @default(now()) @updatedAt
-  revisions TermRevision[]
-  pointer   TermPointer?
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  pointer    TermPointer?
+  revisions  TermRevision[]
+  termParent Term[]         @relation("TermRelated", references: [id])
+  termChild  Term[]         @relation("TermRelated", references: [id])
 }
 
 model TermRevision {
-  id          Int          @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   description String?
-  createdAt   DateTime     @default(now())
-  term        Term         @relation(fields: [termId], references: [id])
+  createdAt   DateTime @default(now())
   termId      Int
-  TermPointer TermPointer?
+
+  term        Term         @relation(fields: [termId], references: [id])
+  termPointer TermPointer?
 }
 
 model TermPointer {
-  id         Int          @id @default(autoincrement())
-  term       Term         @relation(fields: [termId], references: [id])
-  termId     Int          @unique
-  revision   TermRevision @relation(fields: [revisionId], references: [id])
-  revisionId Int          @unique
-  updatedAt  DateTime     @default(now()) @updatedAt
+  id         Int      @id @default(autoincrement())
+  termId     Int      @unique
+  revisionId Int      @unique
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  term     Term         @relation(fields: [termId], references: [id])
+  revision TermRevision @relation(fields: [revisionId], references: [id])
 }

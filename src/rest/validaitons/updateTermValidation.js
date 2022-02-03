@@ -1,7 +1,6 @@
 import * as yup from 'yup'
 
-export const createTermSchema = yup.object().shape({
-  name: yup.string().required(),
+export const updateTermSchema = yup.object().shape({
   description: yup.string().optional(),
   termRelatedNames: yup.array().of(yup.string().optional()).optional(),
 })

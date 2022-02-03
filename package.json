@@ -5,7 +5,8 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/server.js --experimental-module"
+    "dev": "nodemon src/server.js --experimental-module",
+    "reset": "npx prisma migrate reset --force"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.4",

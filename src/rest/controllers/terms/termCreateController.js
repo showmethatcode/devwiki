@@ -2,37 +2,44 @@ import { createTermSchema } from '../../validaitons/index.js'
 
 export async function termCreateController(req, res) {
   const { prisma } = req.context
-  const { name, description } = req.body
+  const { name, description, termRelatedNames } = req.body
   const isValid = await createTermSchema.isValid(req.body)
   if (!isValid) {
-    res.sendStatus(400)
+    return res.status(400).send({
+      message: 'invalid parameters',
+    })
   }
 
-  const transactionResult = await prisma.$transaction(async (prisma) => {
-    const {
-      id: termId,
-      name: termName,
-      revisions,
-      createdAt,
-      updatedAt,
-    } = await prisma.term.upsert({
-      where: {
-        name,
-      },
-      create: {
+  const termExists = await prisma.term.findUnique({ where: { name } })
+  if (termExists) {
+    return res.status(400).send({
+      message: 'term has already existed',
+    })
+  }
+
+  const result = await prisma.$transaction(async (prisma) => {
+    const termCreated = await prisma.term.create({
+      data: {
         name,
         revisions: {
           create: {
             description,
           },
         },
-      },
-      update: {
-        revisions: {
-          create: {
-            description,
+        ...(termRelatedNames?.length && {
+          termChild: {
+            connectOrCreate: termRelatedNames.map((name) => ({
+              where: { name },
+              create: {
+                name,
+                /**
+                 * Create Revision for TermRelated
+                 */
+                revisions: { create: {} },
+              },
+            })),
           },
-        },
+        }),
       },
       include: {
         revisions: {
@@ -41,19 +48,53 @@ export async function termCreateController(req, res) {
             id: 'desc',
           },
         },
+        termChild: {
+          include: {
+            revisions: {
+              take: 1,
+              orderBy: { id: 'desc' },
+              include: { termPointer: true },
+            },
+          },
+        },
       },
     })
-    const [revision] = revisions
-    await prisma.termPointer.upsert({
-      where: { termId },
-      create: { termId, revisionId: revision.id },
-      update: { termId, revisionId: revision.id },
-    })
 
-    return { id: termId, termName, description, createdAt, updatedAt }
+    const newRelatedTerms = termCreated.termChild.filter(
+      (term) => !term.revisions[0].termPointer,
+    )
+    await Promise.all([
+      prisma.termPointer.create({
+        data: {
+          termId: termCreated.id,
+          revisionId: termCreated.revisions[0].id,
+        },
+      }),
+      /**
+       * Create pointer for TermRelated just created
+       */
+      ...newRelatedTerms.map((term) =>
+        prisma.termPointer.create({
+          data: { termId: term.id, revisionId: term.revisions[0].id },
+        }),
+      ),
+    ])
+
+    return termCreated
   })
 
-  res.status(201).json({
-    term: transactionResult,
-  })
+  const payload = {
+    term: {
+      id: result.id,
+      name: result.name,
+      description: result.revisions[0].description,
+      createdAt: result.createdAt,
+      updatedAt: result.updatedAt,
+      termsRelated: result.termChild.map((termRelated) => ({
+        id: termRelated.id,
+        name: termRelated.name,
+      })),
+    },
+  }
+  return res.status(201).json(payload)
 }
