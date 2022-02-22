@@ -11,7 +11,7 @@ const prismaClient = new PrismaClient()
 function handleListening() {
   const app = createApplication(prismaClient)
   app.listen(PORT, () => {
-    console.log(`✅ Sever Listening on port http://localhost:${PORT}/`)
+    console.log(`✅ Server Listening on port http://localhost:${PORT}/`)
   })
 }
 
