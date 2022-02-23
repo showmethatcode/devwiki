@@ -117,3 +117,9 @@ dist
 .yarn/install-state.gz
 .pnp.*
 prisma/migrations
+
+
+# docker volume
+db_data
+
+docker rmi -f devwiki-api_app && docker rmi -f postgres:13 && docker-compose up
