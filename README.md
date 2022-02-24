@@ -2,6 +2,7 @@
 
 ## Prerequisite
 - [Install Docker](https://docs.docker.com/engine/install/)
+- [Install docker-compose](https://docs.docker.com/compose/install/)
 
 ## Setup
 ```sh
