@@ -32,8 +32,7 @@ export async function termUpdateController(req, res) {
       data: {
         ...(description !== descriptionFetched && {
           revisions: {
-            connectOrCreate: {
-              where: { description },
+            create: {
               description,
             },
           },
